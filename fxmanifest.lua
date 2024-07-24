@@ -2,18 +2,17 @@ fx_version 'cerulean'
 game 'gta5'
 lua54 'yes'
 
-author '1OSaft'
+author 'Quantum Studios'
 description 'Rollover detection script'
 version '1.0.0'
 
-dependencies {'es_extended'}
-
-
-
 server_scripts {
-    'server.lua',
+    'src/server.lua',
+}
+shared_scripts {
+    '@ox_lib/init.lua',
+    'config.lua'
 }
 client_scripts {
-    '@ox_lib/init.lua',
-    'client.lua'
+    'src/client.lua'
 }
