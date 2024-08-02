@@ -16,3 +16,8 @@ shared_scripts {
 client_scripts {
     'src/client.lua'
 }
+
+dependencies {
+	'ox_lib',
+	'qtm-lib'
+}
