@@ -11,47 +11,23 @@ local function applyCrashDamage(ped, vehicle)
     ShakeGameplayCam('SMALL_EXPLOSION_SHAKE', intensity)
 end
 local function handleDispatch()
-    --Handle the dispatch here | Example below:
-    local data = exports['cd_dispatch']:GetPlayerInfo()
-    TriggerServerEvent('cd_dispatch:AddNotification', {
-        job_table = {'police', 'ambulance' }, 
-        coords = data.coords,
-        title = '10-25 Vehicle Rolled over',
-        message = 'A '..data.sex..' has rolled over their vehicle at '..data.street, 
-        flash = 0,
-        unique_id = data.unique_id,
-        sound = 1,
-        blip = {
-            sprite = 431, 
-            scale = 1.2, 
-            colour = 3,
-            flashes = false, 
-            text = '911 - Vehicle Roll Over',
-            time = 5,
-            radius = 0,
-        }
+    qtm.Dispatch.CreateDispatch({
+        sprite = 431 ,      
+        title = "Rollover",     
+        text = 'A person has rolled over their vehicle!',       
+        blipText = "Rollover",      
+        scale = 1.2,        
+        colour = 3,     
+        flashes = false,        
+        time = 5,       
+        radius = 0,     
     })
 end
 local function notifyRollover()
     if Config.Dispatch then
         handleDispatch()
     end
-    lib.notify({
-        id = 'Rollover',
-        title = Config.Language.notifyTitle,
-        description = Config.Language.notifyDesc,
-        showDuration = true,
-        position = 'top-left',
-        style = {
-            backgroundColor = '#141517',
-            color = '#C1C2C5',
-            ['.description'] = {
-              color = '#909296'
-            }
-        },
-        iconColor = '#C53030',
-        duration = 10000
-    })
+    qtm.Notification(nil, Config.Language.notifyTitle, 'error', Config.Language.notifyDesc)
 end
 
 local function handleRollover(vehicle)
