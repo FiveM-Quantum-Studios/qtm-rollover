@@ -1,38 +1,38 @@
 local triggered = false
 
-local function detectRollover(vehicle)
-    return IsEntityUpsidedown(vehicle)
-end
 
 local function applyCrashDamage(ped, vehicle)
     local speed = GetEntitySpeed(vehicle) * Config.Unit
     local threshold = 50
-    local intensity = math.min(1.0, (speed - threshold) / 100) -- Cap the intensity to a maximum of 1.0
+    local intensity = math.min(1.0, (speed - threshold) / 100)
     ShakeGameplayCam('SMALL_EXPLOSION_SHAKE', intensity)
 end
+
 local function handleDispatch()
     qtm.Dispatch.CreateDispatch({
-        sprite = 431 ,      
-        title = "Rollover",     
-        text = 'A person has rolled over their vehicle!',       
-        blipText = "Rollover",      
-        scale = 1.2,        
-        colour = 3,     
-        flashes = false,        
-        time = 5,       
-        radius = 0,     
+        sprite = 431,
+        title = Config.Language.DispatchTitle,
+        text = Config.Language.DispatchDesc,
+        blipText = Config.Language.BlipText,
+        scale = 1.2,
+        colour = 3,
+        flashes = false,
+        time = 5,
+        radius = 0,
     })
 end
+
 local function notifyRollover()
     if Config.Dispatch then
         handleDispatch()
     end
-    qtm.Notification(nil, Config.Language.notifyTitle, 'error', Config.Language.notifyDesc)
+    qtm.Notification(nil, Config.Language.NotifyTitle, 'error', Config.Language.NotifyDesc)
 end
 
 local function handleRollover(vehicle)
     triggered = true
-    SetVehicleEngineHealth(vehicle, 0)
+    SetVehicleEngineHealth(vehicle, -4001)
+    SetVehicleEngineOn(vehicle, false, true, true)
     local occupants = GetVehicleNumberOfPassengers(vehicle)
     for i = -1, occupants - 1 do
         local occupantPed = GetPedInVehicleSeat(vehicle, i)
@@ -41,23 +41,28 @@ local function handleRollover(vehicle)
         end
     end
     notifyRollover()
+
+    -- Prevent the player from flipping the vehicle back over
+    CreateThread(function()
+        while triggered do
+            DisableControlAction(0, 59, true)  -- Disable lean left/right
+            DisableControlAction(0, 60, true)  -- Disable lean up/down
+            DisableControlAction(0, 61, true)  -- Disable lean back/front
+            DisableControlAction(0, 62, true)  -- Disable handbrake
+            DisableControlAction(0, 63, true)  -- Disable steering left
+            DisableControlAction(0, 64, true)  -- Disable steering right
+            Wait(0)
+        end
+    end)
 end
 
 Citizen.CreateThread(function()
     while true do
-        Citizen.Wait(1000) 
+        Citizen.Wait(1000)
         local ped = PlayerPedId()
         if IsPedInAnyVehicle(ped, false) and not triggered then
             local vehicle = GetVehiclePedIsIn(ped, false)
-            if detectRollover(vehicle) then
-                if Config.PreventFromUnflip then
-                    handleRollover(vehicle)
-                    local roll = GetEntityRoll(vehicle)
-                    if (roll > 75.0 or roll < -75.0) and GetEntitySpeed(vehicle) < 2 then
-                        DisableControlAction(2,59,true)
-                        DisableControlAction(2,60,true)
-                    end
-                end
+            if IsEntityUpsidedown(vehicle) then
                 handleRollover(vehicle)
             end
         end
