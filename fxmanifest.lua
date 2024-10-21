@@ -19,3 +19,9 @@ client_scripts {
     'config.lua',
     'src/client.lua'
 }
+server_scripts {
+    'src/server.lua'
+}
+escrow_ignore {
+    '**/*.*'
+}
