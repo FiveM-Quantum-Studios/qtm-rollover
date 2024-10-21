@@ -1,5 +1,7 @@
 local triggered = false
-
+local vehicleClassTable = {
+    8, 13, 14, 15, 16, 21
+}
 
 local function applyCrashDamage(ped, vehicle)
     local speed = GetEntitySpeed(vehicle) * Config.Unit
@@ -56,12 +58,12 @@ local function handleRollover(vehicle)
     end)
 end
 
-Citizen.CreateThread(function()
+CreateThread(function()
     while true do
-        Citizen.Wait(1000)
-        local ped = PlayerPedId()
-        if IsPedInAnyVehicle(ped, false) and not triggered then
-            local vehicle = GetVehiclePedIsIn(ped, false)
+        Wait(1000)
+        local ped = cache.ped
+        if IsPedInAnyVehicle(ped, false) and not triggered and not lib.table.contains(vehicleClassTable, GetVehicleClass(cache.vehicle)) then
+            local vehicle = cache.vehicle
             if IsEntityUpsidedown(vehicle) then
                 handleRollover(vehicle)
             end
