@@ -64,8 +64,7 @@ CreateThread(function()
         local ped = cache.ped
         if IsPedInAnyVehicle(ped, false) and not triggered and not lib.table.contains(vehicleClassTable, GetVehicleClass(cache.vehicle)) then
             local vehicle = cache.vehicle
-            local _, _, zUp = table.unpack(GetEntityRotation(vehicle, 2))
-            if zUp < -0.7 then
+            if IsEntityUpsidedown(vehicle) then
                 handleRollover(vehicle)
             end
         end
