@@ -1,5 +1,7 @@
 Config = {}
 
+Config.Debug = true
+
 Config.Unit = 3.6 -- | 3.6 = KM/h | 2.236936 = Miles/h
 
 Config.PreventFromUnflip = true

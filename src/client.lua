@@ -1,4 +1,5 @@
 local triggered = false
+local isInVehicle = false
 local vehicleClassTable = {
     8, 13, 14, 15, 16, 21
 }
@@ -61,8 +62,7 @@ end
 CreateThread(function()
     while true do
         Wait(1000)
-        local ped = cache.ped
-        if IsPedInAnyVehicle(ped, false) and not triggered and not lib.table.contains(vehicleClassTable, GetVehicleClass(cache.vehicle)) then
+        if isInVehicle and not triggered then
             local vehicle = cache.vehicle
             if IsEntityUpsidedown(vehicle) then
                 handleRollover(vehicle)
@@ -72,7 +72,14 @@ CreateThread(function()
 end)
 
 lib.onCache('vehicle', function(value)
+    if Config.Debug then
+        print('vehicle', value, "triggered", triggered, "cache.vehicle", cache.vehicle)
+    end
     if triggered and not value and cache.vehicle then
         triggered = false
+    end
+
+    if value and not cache.vehicle and not lib.table.contains(vehicleClassTable, GetVehicleClass(value)) then
+        isInVehicle = true
     end
 end)
